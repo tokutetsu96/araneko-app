@@ -14,6 +14,22 @@ type opggSummoner = {
   summonerName: string;
   opggUrl: string;
   tag: string;
+  rankInfo: RankInfo;
+};
+
+type RankInfo = {
+  leagueId: string;
+  queueType: string;
+  tier: string;
+  rank: string;
+  summonerId: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  veteran: boolean;
+  inactive: boolean;
+  freshBlood: boolean;
+  hotStreak: boolean;
 };
 
 export default function OPGGListPage() {
@@ -23,21 +39,32 @@ export default function OPGGListPage() {
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false); // State to toggle form visibility
+  const [showForm, setShowForm] = useState(false);
 
-  const API_ENTRIES_URL = "/api/opgg-summoner";
+  const API_SUMMONER_URL = "/api/opgg-summoner";
 
-  // APIからデータを取得
-  const fetchEntries = async () => {
+  const fetchSummoners = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(API_BASE_URL + API_ENTRIES_URL);
+      const response = await fetch(API_BASE_URL + API_SUMMONER_URL);
       if (!response.ok) {
         throw new Error(`データの取得に失敗しました: HTTP ${response.status}`);
       }
       const data = await response.json();
-      setSummoners(data);
+      // サモナー情報を取得した後、ランク情報をRiot APIから取得
+      const summonersWithRank = await Promise.all(
+        data.map(async (summoner: opggSummoner) => {
+          const rankData = await fetchRankInfo(
+            summoner.summonerName,
+            summoner.tag
+          );
+
+          return { ...summoner, rankInfo: rankData || {} };
+        })
+      );
+
+      setSummoners(summonersWithRank);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -49,13 +76,29 @@ export default function OPGGListPage() {
     }
   };
 
-  // 初期データ取得
+  const fetchRankInfo = async (summonerName: string, tag: string) => {
+    const response = await fetch(
+      `/api/summoner?gameName=${summonerName}&tagLine=${tag}`
+    );
+
+    if (!response.ok) {
+      setError("サモナー情報の取得に失敗しました");
+      return null;
+    }
+
+    const data = await response.json();
+    if (!data.rankData || data.rankData.length === 0) {
+      return null;
+    }
+
+    return data.rankData[0];
+  };
+
   useEffect(() => {
-    fetchEntries();
+    fetchSummoners();
   }, []);
 
-  // 登録処理
-  const handleAddEntry = async () => {
+  const handleAddSummoner = async () => {
     if (!summonerName.trim() || !opggUrl.trim() || !tag.trim()) {
       setError("名前とURLを入力してください！");
       return;
@@ -65,13 +108,12 @@ export default function OPGGListPage() {
     setError(null);
     try {
       const response = await fetch(`${API_BASE_URL}/api/opgg-summoner`, {
-        // ✅ API_URLを統一
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          summonerName, // ✅ キー名をサーバー側と統一
+          summonerName,
           opggUrl,
           tag,
         }),
@@ -81,8 +123,8 @@ export default function OPGGListPage() {
         throw new Error("データの登録に失敗しました");
       }
 
-      // データの再取得
-      await fetchEntries();
+      await fetchSummoners();
+
       setSummonerName("");
       setOpggUrl("");
       setTag("");
@@ -102,7 +144,6 @@ export default function OPGGListPage() {
     <div className="container mx-auto p-10 space-y-6">
       <h1 className="text-4xl font-semibold text-center">OPGG 一覧</h1>
 
-      {/* エラー表示 */}
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>{error}</AlertDescription>
@@ -118,7 +159,6 @@ export default function OPGGListPage() {
         </span>
       </div>
 
-      {/* プルダウン形式で表示されるフォーム */}
       <div
         className={`overflow-hidden transition-all duration-300 ${
           showForm ? "max-h-96" : "max-h-0"
@@ -157,7 +197,7 @@ export default function OPGGListPage() {
           </div>
 
           <Button
-            onClick={handleAddEntry}
+            onClick={handleAddSummoner}
             disabled={loading}
             className="w-full"
           >
@@ -170,15 +210,32 @@ export default function OPGGListPage() {
 
       <div className="space-y-4">
         {summoners.map((summoner) => (
-          <Card key={summoner.id} className="p-4 hover:bg-gray-100">
+          <Card
+            key={summoner.id}
+            className="p-4 hover:shadow-lg hover:scale-105 transition"
+          >
             <CardHeader>
               <a
                 href={summoner.opggUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
               >
-                {summoner.summonerName}
+                <div className="flex space-x-2 font-bold">
+                  <p>{summoner.summonerName}</p>
+                  <p>#{summoner.tag}</p>
+                </div>
+
+                {summoner.rankInfo.tier ? (
+                  <div className="flex space-x-2 mt-2 text-sm text-gray-500">
+                    <p>{summoner.rankInfo.tier}</p>
+                    <p>{summoner.rankInfo.rank}</p>
+                    <p>{summoner.rankInfo.leaguePoints}LP</p>
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm text-gray-500">
+                    ランク情報なし
+                  </div>
+                )}
               </a>
             </CardHeader>
           </Card>

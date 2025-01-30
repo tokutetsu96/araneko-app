@@ -33,17 +33,15 @@ export default function Header() {
             </div>
 
             {/* ログインユーザー情報 & ログアウトボタン */}
-            {session && (
-              <div className="flex items-center gap-4 ml-auto">
-                <span className="font-bold">{session.user?.name}</span>
-                <Button
-                  onClick={() => signOut({ callbackUrl: "/api/auth/signin" })}
-                  className="px-4 py-2 rounded-md text-sm font-bold"
-                >
-                  ログアウト
-                </Button>
-              </div>
-            )}
+            <div className="flex items-center gap-4 ml-auto">
+              <span className="font-bold">{session?.user?.name}</span>
+              <Button
+                onClick={() => signOut({ callbackUrl: "/api/auth/signin" })}
+                className="px-4 py-2 rounded-md text-sm font-bold"
+              >
+                ログアウト
+              </Button>
+            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
@@ -73,7 +71,7 @@ export default function Header() {
               {session && (
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-sm font-bold">
-                    {session.user?.name}
+                    {session?.user?.name}
                   </span>
                   <button
                     onClick={() => signOut({ callbackUrl: "/api/auth/signin" })}

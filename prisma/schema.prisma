@@ -19,6 +19,8 @@ model User {
   email     String  @unique
   image     String?
   createdAt DateTime @default(now())
+
+  opggSummoners OpggSummoner[]
 }
 
 model OpggSummoner {
@@ -26,4 +28,8 @@ model OpggSummoner {
   summonerName String  
   tag          String
   opggUrl      String  
+  userId       String?
+
+  user         User? @relation(fields: [userId], references: [id])
 }
+
