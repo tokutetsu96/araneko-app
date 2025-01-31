@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions, User, Session } from "next-auth";
+import NextAuth, { NextAuthOptions, User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 
@@ -34,16 +34,10 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-    async session({ session }: { session: Session }) {
-      if (session.user?.email) {
-        const user = await prisma.user.findUnique({
-          where: { email: session.user.email },
-        });
-
-        // `session.user.id` を型安全に設定
-        if (user) {
-          (session.user as { id: string }).id = user.id;
-        }
+    async session({ session, user }) {
+      if (session.user) {
+        // セッションにユーザーIDを追加
+        session.user.id = user.id;
       }
       return session;
     },
