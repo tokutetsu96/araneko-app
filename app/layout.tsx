@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <AuthProvider>
         <body className={`${notoSansJP.variable} antialiased`}>{children}</body>
       </AuthProvider>

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 
 /**
- * OPGGListへの登録API
+ * テーブル"OpggSummoner"へのsummoner登録API
  *
  * @param req
  * @returns
