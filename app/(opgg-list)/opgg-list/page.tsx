@@ -99,10 +99,10 @@ export default function OPGGListPage() {
   }, []);
 
   const handleAddSummoner = async () => {
-    if (!summonerName.trim() || !opggUrl.trim() || !tag.trim()) {
-      setError("名前とURLを入力してください！");
-      return;
-    }
+    // if (!summonerName.trim() || !opggUrl.trim() || !tag.trim()) {
+    //   setError("名前とURLを入力してください！");
+    //   return;
+    // }
 
     setLoading(true);
     setError(null);

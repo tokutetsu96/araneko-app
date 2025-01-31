@@ -34,12 +34,25 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-    async session({ session, user }) {
-      if (session.user) {
-        // セッションにユーザーIDを追加
-        session.user.id = user.id;
+    async session({ session }) {
+      if (session.user?.email) {
+        const existingUser = await prisma.user.findUnique({
+          // GoogleのemailでSupabaseのidを取得
+          where: { email: session.user.email },
+        });
+
+        if (existingUser) {
+          // SupabaseのIDに置き換え
+          session.user.id = existingUser.id;
+        }
       }
       return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
