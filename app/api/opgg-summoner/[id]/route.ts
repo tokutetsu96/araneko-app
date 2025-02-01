@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: number } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await prisma.opggSummoner.delete({

@@ -7,6 +7,7 @@ export function ThemeProvider({
   children,
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
