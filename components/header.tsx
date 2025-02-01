@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation"; // 現在のパスを取得
 import links from "../data/link";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { ThemeButton } from "./theme-button";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +18,7 @@ export default function Header() {
   return (
     <div className="w-full">
       {/* Main Navigation */}
-      <nav className="bg-white border-b">
+      <nav className="border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center h-16 relative">
             {/* メインナビを中央配置 */}
@@ -45,7 +46,7 @@ export default function Header() {
             </div>
 
             {/* ログインユーザー情報 & ログアウトボタン（右端） */}
-            <div className="ml-auto flex items-center gap-4">
+            <div className="ml-auto flex items-center gap-4 relative">
               <Avatar className="w-10 h-10">
                 {session?.user?.image && (
                   <AvatarImage
@@ -61,6 +62,8 @@ export default function Header() {
               >
                 ログアウト
               </Button>
+
+              <ThemeButton />
             </div>
 
             {/* Mobile menu button */}

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useTheme } from "next-themes";
 import { API_BASE_URL } from "@/config/config";
 
 type AddSummonerProps = {
@@ -9,15 +10,29 @@ type AddSummonerProps = {
   setError: (error: string | null) => void;
 };
 
-export default function AddSummoner({
+export default function AddSummonerForm({
   fetchSummoners,
   setError,
 }: AddSummonerProps) {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [summonerName, setSummonerName] = useState("");
   const [opggUrl, setOpggUrl] = useState("");
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // クライアントでマウントされたことを確認
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // マウント前は透明な背景を適用し、マウント後に適切な背景を設定
+  const bgColor = !mounted
+    ? "bg-transparent"
+    : theme === "dark"
+    ? "bg-black text-white"
+    : "bg-white text-black";
 
   const handleAddSummoner = async () => {
     if (!summonerName.trim() || !opggUrl.trim() || !tag.trim()) {
@@ -62,7 +77,7 @@ export default function AddSummoner({
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <div
         className="cursor-pointer text-lg flex items-center space-x-2"
         onClick={() => setShowForm(!showForm)}
@@ -73,7 +88,7 @@ export default function AddSummoner({
       </div>
 
       <div
-        className={`absolute left-0 w-full bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 ${
+        className={`absolute left-0 w-full shadow-lg rounded-lg overflow-hidden transition-all duration-300 ${bgColor} ${
           showForm ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -19,10 +20,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
-      <AuthProvider>
-        <body className={`${notoSansJP.variable} antialiased`}>{children}</body>
-      </AuthProvider>
+    <html lang="ja" suppressHydrationWarning>
+      <body className={`${notoSansJP.variable} antialiased`}>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

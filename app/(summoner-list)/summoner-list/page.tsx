@@ -5,9 +5,10 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { API_BASE_URL } from "../../../config/config";
 import { useState, useEffect } from "react";
 import Spinner from "@/components/spinner";
-import AddSummoner from "@/components/add-summoner";
+import AddSummonerForm from "@/components/add-summoner-form";
 import { opggSummoner } from "@/types/summoner";
 import { getRankColor } from "@/app/utils/rankUtils";
+import DetailButton from "@/components/detail-button";
 
 export default function OPGGListPage() {
   const [summoners, setSummoners] = useState<opggSummoner[]>([]);
@@ -64,6 +65,12 @@ export default function OPGGListPage() {
     return data.rankData[0];
   };
 
+  const handleDelete = (id: number) => {
+    setSummoners((prevSummoners) =>
+      prevSummoners.filter((summoner) => summoner.id !== id)
+    );
+  };
+
   useEffect(() => {
     fetchSummoners();
   }, []);
@@ -78,7 +85,7 @@ export default function OPGGListPage() {
         </Alert>
       )}
 
-      <AddSummoner fetchSummoners={fetchSummoners} setError={setError} />
+      <AddSummonerForm fetchSummoners={fetchSummoners} setError={setError} />
 
       {loading && <Spinner />}
 
@@ -90,7 +97,8 @@ export default function OPGGListPage() {
               summoner.rankInfo?.tier
             )}`}
           >
-            <CardHeader>
+            <CardHeader className="relative">
+              <DetailButton id={summoner.id} onDelete={handleDelete} />
               <a
                 href={summoner.opggUrl}
                 target="_blank"
