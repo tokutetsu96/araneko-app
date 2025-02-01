@@ -3,7 +3,6 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
-import { API_BASE_URL } from "@/config/config";
 
 type AddSummonerProps = {
   fetchSummoners: () => Promise<void>;
@@ -43,7 +42,7 @@ export default function AddSummonerForm({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/opgg-summoner`, {
+      const response = await fetch("/api/opgg-summoner", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
