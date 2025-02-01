@@ -2,7 +2,6 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardHeader } from "@/components/ui/card";
-import { API_BASE_URL } from "../../../config/config";
 import { useState, useEffect } from "react";
 import Spinner from "@/components/spinner";
 import AddSummonerForm from "@/components/add-summoner-form";
@@ -19,7 +18,7 @@ export default function OPGGListPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(API_BASE_URL + "/api/opgg-summoner");
+      const response = await fetch("/api/opgg-summoner");
       if (!response.ok) {
         throw new Error(`データの取得に失敗しました: HTTP ${response.status}`);
       }
