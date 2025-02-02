@@ -48,7 +48,14 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        // `prisma.user` から UUID を取得して token にセット
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+
+        if (dbUser) {
+          token.id = dbUser.id; // UUID を token.id に保存
+        }
       }
       return token;
     },

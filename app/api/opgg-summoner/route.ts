@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
+    console.log(session);
     const newSummoner = await prisma.opggSummoner.create({
       data: {
         summonerName,

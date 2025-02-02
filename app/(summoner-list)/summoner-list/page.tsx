@@ -2,7 +2,7 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardHeader } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Spinner from "@/components/spinner";
 import AddSummonerForm from "@/components/add-summoner-form";
 import { opggSummoner } from "@/types/summoner";
@@ -14,9 +14,11 @@ export default function OPGGListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSummoners = async () => {
+  // 無限レンダリングを防ぐために、useCallbackを使って関数をメモ化
+  const fetchSummoners = useCallback(async () => {
+    // ローディング開始
     setLoading(true);
-    setError(null);
+
     try {
       const response = await fetch("/api/opgg-summoner");
       if (!response.ok) {
@@ -42,10 +44,12 @@ export default function OPGGListPage() {
         setError("不明なエラーが発生しました");
       }
     } finally {
+      // 必ずローディング終了
       setLoading(false);
     }
-  };
+  }, []);
 
+  // ランク情報を取得する
   const fetchRankInfo = async (summonerName: string, tag: string) => {
     const response = await fetch(
       `/api/summoner?gameName=${summonerName}&tagLine=${tag}`
@@ -64,20 +68,19 @@ export default function OPGGListPage() {
     return data.rankData[0];
   };
 
+  // 初期表示処理
+  useEffect(() => {
+    fetchSummoners();
+  }, [fetchSummoners]);
+
   const handleDelete = (id: number) => {
     setSummoners((prevSummoners) =>
       prevSummoners.filter((summoner) => summoner.id !== id)
     );
   };
 
-  useEffect(() => {
-    fetchSummoners();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="container mx-auto p-10 space-y-6">
+    <div className="container mx-auto p-10 min-h-screen space-y-6">
       <h1 className="text-4xl font-semibold text-center">Summoner List</h1>
 
       {error && (
