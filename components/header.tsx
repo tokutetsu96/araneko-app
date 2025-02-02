@@ -17,7 +17,7 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <div className="w-full border-b bg-white">
+    <div className="w-full border-b">
       {/* Main Navigation */}
       <nav className="max-w-7xl mx-auto px-4 relative">
         <div className="flex items-center justify-between h-16">

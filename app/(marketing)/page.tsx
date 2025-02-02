@@ -13,7 +13,7 @@ export default function Home() {
       >
         <Card className="p-6 text-center shadow-lg">
           <CardContent>
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-4xl font-bold mt-6">
               ようこそ！AraNeko APPへ！
             </h1>
             <p className="mt-2 text-lg font-semibold">

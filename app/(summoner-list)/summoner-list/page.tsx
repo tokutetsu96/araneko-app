@@ -113,7 +113,7 @@ export default function OPGGListPage() {
                   <p>{summoner.summonerName}</p>
                   <p>#{summoner.tag}</p>
                 </div>
-
+                {/* ランク情報の有無で表示する内容を変える */}
                 {summoner.rankInfo?.tier ? (
                   <div
                     className={`flex space-x-2 mt-2 text-sm ${getRankColor(

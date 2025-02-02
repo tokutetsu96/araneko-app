@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
     const { puuid } = accountData;
 
-    await sleep(1000);
+    await sleep(500);
     // **2. Summoner ID を取得**
     const summonerResponse = await fetch(
       `${RIOT_LOL_API}/summoner/v4/summoners/by-puuid/${puuid}?api_key=${API_KEY}`
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     }
 
     const { id: summonerId } = summonerData;
-    await sleep(1000);
+    await sleep(500);
     // **3. ランク情報を取得**
     const rankResponse = await fetch(
       `${RIOT_LOL_API}/league/v4/entries/by-summoner/${summonerId}?api_key=${API_KEY}`
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     const rankData = await rankResponse.json();
 
     if (!rankResponse.ok || rankData.length === 0) {
-      // ランクをプレイしていない場合もあるのでnullで返す
+      // ランクをプレイしていない場合もあるのでnullを返す
       return NextResponse.json({ summonerData, rankData: null });
     }
 
