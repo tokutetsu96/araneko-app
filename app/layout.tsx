@@ -3,6 +3,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -30,6 +31,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </AuthProvider>
       </body>

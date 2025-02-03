@@ -7,7 +7,7 @@ import Spinner from "@/components/spinner";
 import AddSummonerForm from "@/components/add-summoner-form";
 import { opggSummoner } from "@/types/summoner";
 import { getRankColor } from "@/app/utils/rankUtils";
-import DetailButton from "@/components/detail-button";
+import DeleteButton from "@/components/delete-button";
 
 export default function OPGGListPage() {
   const [summoners, setSummoners] = useState<opggSummoner[]>([]);
@@ -102,7 +102,7 @@ export default function OPGGListPage() {
             )}`}
           >
             <CardHeader className="relative">
-              <DetailButton id={summoner.id} onDelete={handleDelete} />
+              <DeleteButton id={summoner.id} onDelete={handleDelete} />
               <a
                 href={summoner.opggUrl}
                 target="_blank"

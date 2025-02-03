@@ -1,19 +1,27 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  addSummonerSchema,
+  addSummonerSchemaType,
+} from "@/lib/validations/add-summoner";
 
 type AddSummonerProps = {
   fetchSummoners: () => Promise<void>;
   setError: (error: string | null) => void;
-};
-
-type FormData = {
-  summonerName: string;
-  opggUrl: string;
-  tag: string;
 };
 
 export default function AddSummonerForm({
@@ -25,12 +33,14 @@ export default function AddSummonerForm({
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>();
+  const form = useForm<addSummonerSchemaType>({
+    resolver: zodResolver(addSummonerSchema),
+    defaultValues: {
+      summonerName: "",
+      tag: "",
+      opggUrl: "",
+    },
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +52,7 @@ export default function AddSummonerForm({
     ? "bg-black text-white"
     : "bg-white text-black";
 
-  const handleSubmitSummoner: SubmitHandler<FormData> = async (data) => {
+  const handleSubmitSummoner = async (data: addSummonerSchemaType) => {
     setLoading(true);
     setError(null);
 
@@ -58,14 +68,12 @@ export default function AddSummonerForm({
       }
 
       await fetchSummoners();
-      reset();
+      form.reset();
       setShowForm(false);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("不明なエラーが発生しました");
-      }
+      setError(
+        err instanceof Error ? err.message : "不明なエラーが発生しました"
+      );
     } finally {
       setLoading(false);
     }
@@ -87,65 +95,72 @@ export default function AddSummonerForm({
           showForm ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <form
-          onSubmit={handleSubmit(handleSubmitSummoner)}
-          className="space-y-6 m-4"
-        >
-          <div className="flex gap-2">
-            <div>
-              <Label className="font-bold">サモナー名</Label>
-              <Input
-                placeholder="例:Farm Merge King"
-                className="w-full"
-                {...register("summonerName", {
-                  required: "※サモナー名は必須です",
-                })}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmitSummoner)}
+            className="space-y-6 m-4"
+          >
+            <div className="flex gap-2">
+              <FormField
+                control={form.control}
+                name="summonerName"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label className="font-bold">サモナー名</Label>
+                    <FormControl>
+                      <Input
+                        placeholder="例:Farm Merge King"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.summonerName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.summonerName.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label className="font-bold">タグ ※＃なしで入力</Label>
-              <Input
-                placeholder="例:ふぁまきん"
-                className="w-full"
-                {...register("tag", { required: "※タグは必須です" })}
-              />
-              {errors.tag && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.tag.message}
-                </p>
-              )}
-            </div>
-          </div>
 
-          <div>
-            <Label className="font-bold">OPGG URL</Label>
-            <Input
-              placeholder="登録したいサモナーのOPGGのURLを貼り付けてください"
-              className="w-full"
-              {...register("opggUrl", {
-                required: "※OPGG URLは必須です",
-                pattern: {
-                  value: /^https?:\/\/(www\.)?op\.gg\/.+/,
-                  message: "※正しいOPGG URLを入力してください",
-                },
-              })}
+              <FormField
+                control={form.control}
+                name="tag"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label className="font-bold">タグ ※＃なしで入力</Label>
+                    <FormControl>
+                      <Input
+                        placeholder="例:ふぁまきん"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="opggUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="font-bold">OPGG URL</Label>
+                  <FormControl>
+                    <Input
+                      placeholder="登録したいサモナーのOPGGのURLを貼り付けてください"
+                      className="w-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.opggUrl && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.opggUrl.message}
-              </p>
-            )}
-          </div>
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "登録中..." : "登録"}
-          </Button>
-        </form>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "登録中..." : "登録"}
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );

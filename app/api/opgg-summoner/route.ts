@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import { addSummonerSchema } from "@/lib/validations/add-summoner";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -11,22 +12,22 @@ import { NextResponse } from "next/server";
  */
 export async function POST(req: Request) {
   try {
-    const { summonerName, tag, opggUrl } = await req.json();
+    const json = await req.json();
+    const body = addSummonerSchema.parse(json);
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
-    if (!summonerName || !tag || !opggUrl) {
+    if (!body.summonerName || !body.tag || !body.opggUrl) {
       return NextResponse.json(
         { error: "すべての項目を入力してください" },
         { status: 400 }
       );
     }
-    console.log(session);
     const newSummoner = await prisma.opggSummoner.create({
       data: {
-        summonerName,
-        tag,
-        opggUrl,
-        userId,
+        summonerName: body.summonerName,
+        tag: body.tag,
+        opggUrl: body.opggUrl,
+        userId: userId,
       },
     });
 

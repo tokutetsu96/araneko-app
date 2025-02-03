@@ -1,20 +1,32 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+const routeContextSchema = z.object({
+  params: z.object({
+    id: z.string(),
+  }),
+});
 
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const resolvedParams = await context.params;
+
+    const { params } = routeContextSchema.parse({ params: resolvedParams });
+
     await prisma.opggSummoner.delete({
-      where: { id: Number(id) },
+      where: { id: Number(params.id) },
     });
 
-    return NextResponse.json({ message: "削除に成功しました" });
+    return NextResponse.json(
+      { message: "削除に成功しました" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("削除中にエラーが発生しました:", error);
     return NextResponse.json(
