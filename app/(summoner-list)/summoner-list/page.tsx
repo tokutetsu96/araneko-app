@@ -80,8 +80,9 @@ export default function OPGGListPage() {
   };
 
   return (
-    <div className="container mx-auto p-10 min-h-screen space-y-6">
-      <h1 className="text-4xl font-semibold text-center">Summoner List</h1>
+    <div className="container mx-auto p-10 space-y-6">
+      <h1 className="text-4xl font-semibold">Summoner List</h1>
+      <hr className="border-t-2" />
 
       {error && (
         <Alert variant="destructive" className="mb-6">

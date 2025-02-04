@@ -5,7 +5,7 @@ export interface LinkData {
 
 const links: LinkData[] = [
   { href: "/summoner-list", label: "SummonerList" },
-  { href: "/a", label: "TEST1" },
+  { href: "/tips", label: "Tips" },
   { href: "/c", label: "TEST2" },
   { href: "/d", label: "TEST3" },
 ];

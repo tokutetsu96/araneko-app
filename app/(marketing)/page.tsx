@@ -1,27 +1,20 @@
-"use client";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import MotionLabel from "@/components/motion-label";
 
 export default function Home() {
   return (
-    <div className="container mx-auto p-10 flex items-center justify-center min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <Card className="p-6 text-center shadow-lg">
-          <CardContent>
-            <h1 className="text-4xl font-bold mt-6">
-              ようこそ！AraNeko APPへ！
-            </h1>
-            <p className="mt-2 text-lg font-semibold">
-              登録したOpggListを簡単に管理できます。
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
+    <div className="container">
+      <MotionLabel />
+      <section>
+        <div>
+          <h1 className="text-3xl font-bold">ようこそ</h1>
+          <hr className="my-2 border-t-2" />
+        </div>
+        <div>
+          <p>
+            このサイトは、AraNekoが個人で開発したLoL向けの便利ツールサイトです。今後もLoLに関する便利な機能を追加していく予定です。
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
