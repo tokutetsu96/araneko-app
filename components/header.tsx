@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation"; // 現在のパスを取得
 import links from "../data/link";
@@ -11,7 +9,6 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { ThemeButton } from "./theme-button";
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session } = useSession();
   // 現在のページのパス
   const pathname = usePathname();
@@ -70,49 +67,8 @@ export default function Header() {
 
             <ThemeButton />
           </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center ml-auto">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-800"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-          </div>
         </div>
       </nav>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden px-2 pt-2 pb-3 space-y-1">
-          {links.map((link, index) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={index}
-                href={link.href}
-                className={`block px-3 py-2 text-sm font-medium ${
-                  isActive ? "underline decoration-blue-500" : ""
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-          {session && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-sm font-bold">{session?.user?.name}</span>
-              <button
-                onClick={() => signOut({ callbackUrl: "/api/auth/signin" })}
-                className="w-full text-left px-3 py-2 text-sm font-medium bg-red-500 text-white rounded-md"
-              >
-                ログアウト
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
