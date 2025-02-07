@@ -18,6 +18,7 @@ import {
   addSummonerSchema,
   addSummonerSchemaType,
 } from "@/lib/validations/add-summoner";
+import { toast } from "@/hooks/use-toast";
 
 type AddSummonerProps = {
   fetchSummoners: () => Promise<void>;
@@ -64,7 +65,12 @@ export default function AddSummonerForm({
       });
 
       if (!response.ok) {
-        throw new Error("データの登録に失敗しました");
+        form.reset();
+        return toast({
+          title: "登録に失敗しました。",
+          description: "入力したサモナーはJPサーバーに存在しません",
+          variant: "destructive",
+        });
       }
 
       await fetchSummoners();

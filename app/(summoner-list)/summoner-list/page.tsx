@@ -52,7 +52,7 @@ export default function OPGGListPage() {
   // ランク情報を取得する
   const fetchRankInfo = async (summonerName: string, tag: string) => {
     const response = await fetch(
-      `/api/summoner?gameName=${summonerName}&tagLine=${tag}`
+      `/api/fetch-summoner?gameName=${summonerName}&tagLine=${tag}`
     );
 
     if (!response.ok) {

@@ -1,3 +1,4 @@
+import { API_KEY, RIOT_ACCOUNT_API, RIOT_LOL_API } from "@/constants/riotapi";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -14,11 +15,6 @@ export async function GET(request: Request) {
     );
   }
 
-  const API_KEY = process.env.RIOT_API_KEY;
-  const RIOT_ACCOUNT_API =
-    "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id";
-  const RIOT_LOL_API = "https://jp1.api.riotgames.com/lol"; // JPサーバー用
-
   try {
     // **1. PUUID を取得**
     const accountResponse = await fetch(
@@ -29,7 +25,6 @@ export async function GET(request: Request) {
     const accountData = await accountResponse.json();
 
     if (!accountResponse.ok || !accountData.puuid) {
-      console.error("PUUID 取得エラー:", accountData);
       throw new Error(
         accountData.status?.message || "PUUID の取得に失敗しました"
       );

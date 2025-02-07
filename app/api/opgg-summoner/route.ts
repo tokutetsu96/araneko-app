@@ -1,3 +1,4 @@
+import { API_KEY, RIOT_ACCOUNT_API } from "@/constants/riotapi";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { addSummonerSchema } from "@/lib/validations/add-summoner";
@@ -22,6 +23,21 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const accountResponse = await fetch(
+      `${RIOT_ACCOUNT_API}/${encodeURIComponent(
+        body.summonerName
+      )}/${encodeURIComponent(body.tag)}?api_key=${API_KEY}`
+    );
+    const accountData = await accountResponse.json();
+
+    if (!accountResponse.ok || !accountData.puuid) {
+      return NextResponse.json(
+        { error: "サモナー情報の取得に失敗しました" },
+        { status: 400 }
+      );
+    }
+
     const newSummoner = await prisma.opggSummoner.create({
       data: {
         summonerName: body.summonerName,
