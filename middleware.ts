@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // 認証ページ (/auth/signin) では middleware をスキップ
-  if (pathname.startsWith("/api/auth/signin")) {
+  if (pathname.startsWith("/api/auth/login")) {
     return NextResponse.next();
   }
 
@@ -20,7 +20,7 @@ export async function middleware(req: NextRequest) {
 
   // 認証されていない場合は /auth/signin にリダイレクト
   if (!isAuth) {
-    return NextResponse.redirect(new URL("/api/auth/signin", req.url));
+    return NextResponse.redirect(new URL("/api/auth/login", req.url));
   }
 
   return NextResponse.next();

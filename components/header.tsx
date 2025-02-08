@@ -59,7 +59,7 @@ export default function Header() {
               )}
             </Avatar>
             <Button
-              onClick={() => signOut({ callbackUrl: "/api/auth/signin" })}
+              onClick={() => signOut({ callbackUrl: "/api/auth/login" })}
               className="px-4 py-2 rounded-md text-sm font-bold"
             >
               ログアウト
