@@ -49,7 +49,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newSummoner, { status: 201 });
   } catch (error) {
-    console.error("Error creating OpggSummoner:", error);
     return NextResponse.json(
       { error: "サーバーエラーが発生しました" },
       { status: 500 }
@@ -71,7 +70,6 @@ export async function GET() {
     });
     return NextResponse.json(summoners, { status: 200 });
   } catch (error) {
-    console.error("Not found OpggSummoner:", error);
     return NextResponse.json({ error: "データ取得エラー" }, { status: 500 });
   }
 }

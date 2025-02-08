@@ -28,7 +28,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error("削除中にエラーが発生しました:", error);
     return NextResponse.json(
       { message: "削除に失敗しました" },
       { status: 500 }

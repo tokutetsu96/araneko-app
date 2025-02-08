@@ -40,7 +40,6 @@ export async function GET(request: Request) {
     const summonerData = await summonerResponse.json();
 
     if (!summonerResponse.ok || !summonerData.id) {
-      console.error("サモナー情報取得エラー:", summonerData);
       throw new Error(
         summonerData.status?.message || "サモナー情報の取得に失敗しました"
       );
@@ -61,7 +60,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ summonerData, rankData });
   } catch (error: any) {
-    console.error("APIエラー:", error.message);
     return NextResponse.json(
       { error: error.message || "内部サーバーエラー" },
       { status: 500 }
