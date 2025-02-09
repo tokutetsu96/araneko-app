@@ -1,18 +1,11 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import nodemailer from "nodemailer";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import GoogleProvider from "next-auth/providers/google";
 
 const prisma = new PrismaClient();
-
-if (
-  !process.env.NEXTAUTH_SECRET ||
-  !process.env.EMAIL_SERVER ||
-  !process.env.EMAIL_FROM
-) {
-  throw new Error("Missing environment variables for authentication");
-}
 
 // Gmail の SMTP 設定
 const transporter = nodemailer.createTransport({
@@ -26,6 +19,10 @@ const transporter = nodemailer.createTransport({
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     EmailProvider({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
@@ -51,56 +48,105 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/api/auth/login",
+    signIn: "/login",
   },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      console.log("🔀 リダイレクト先:", url);
       if (url.includes("/api/auth/callback/email")) {
         return `${baseUrl}/`;
       }
-      return url.startsWith(baseUrl) ? url : baseUrl;
+      return baseUrl;
     },
-    async signIn({ user }) {
-      try {
-        // DB にユーザーが存在するか確認
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
+
+    async signIn({ user, account }) {
+      console.log("🔍 signIn user:", user);
+      console.log("🔍 signIn account:", account);
+
+      if (!user.email) {
+        console.error("❌ User email is missing");
+        return false;
+      }
+
+      // ✅ `account` が null の場合をチェック
+      if (!account) {
+        console.error("❌ Account information is missing");
+        return false;
+      }
+
+      // 既存のユーザーを取得
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      });
+
+      if (existingUser) {
+        // 既存のユーザーがいる場合、そのユーザーの `Account` を確認
+        const existingAccount = await prisma.account.findUnique({
+          where: {
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+          },
         });
 
-        if (!existingUser) {
-          console.log("🆕 新規ユーザーを作成:", user.email);
-          await prisma.user.create({
+        if (!existingAccount) {
+          console.log("🆕 既存のユーザーに Google アカウントをリンク");
+          await prisma.account.create({
             data: {
-              name: user.name ?? "",
-              email: user.email ?? "",
-              image: user.image ?? "",
+              userId: existingUser.id,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              type: account.type,
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
             },
           });
         }
-
-        return true;
-      } catch (error) {
-        return false;
-      }
-    },
-    async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
+      } else {
+        // 既存のユーザーがいない場合、新規作成
+        console.log("🆕 新規ユーザーを作成:", user.email);
+        const newUser = await prisma.user.create({
+          data: {
+            name: user.name ?? "",
+            email: user.email,
+            image: user.image ?? "",
+          },
         });
 
-        if (dbUser) {
-          token.id = dbUser.id;
-        }
+        console.log("🔗 新規ユーザーに Google アカウントをリンク");
+        await prisma.account.create({
+          data: {
+            userId: newUser.id,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            type: account.type,
+            access_token: account.access_token,
+            refresh_token: account.refresh_token,
+            expires_at: account.expires_at,
+          },
+        });
+      }
+
+      return true;
+    },
+
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
       }
       return token;
+    },
+
+    async session({ token, session }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.picture;
+      }
+      return session;
     },
   },
   session: { strategy: "jwt" },

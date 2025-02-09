@@ -17,12 +17,20 @@ export default function LoginForm() {
   // Google 認証処理
   const handleGoogleSignIn = async () => {
     setIsGoogleLoginLoading(true);
-    await signIn("google", { callbackUrl: "/" });
+    const result = await signIn("google");
+
+    if (result?.error) {
+      toast({
+        title: "Googleログインに失敗しました。",
+        description: "もう一度試してください。",
+        variant: "destructive",
+      });
+    }
   };
 
   // Magic Link（メール認証）処理
   const handleEmailSignIn = async (event: React.FormEvent) => {
-    event.preventDefault(); // フォームのデフォルト動作を防ぐ
+    event.preventDefault();
 
     if (!email) {
       return toast({
@@ -77,7 +85,7 @@ export default function LoginForm() {
               送信中...
             </Button>
           ) : (
-            <Button type="submit">ログインリンクを送信</Button>
+            <Button type="submit">ログイン</Button>
           )}
         </div>
       </form>

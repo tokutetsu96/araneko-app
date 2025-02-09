@@ -3,13 +3,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // ✅ NextAuthのAPIルートは middleware の影響を受けないようにする
+  if (pathname.startsWith("/api/auth/")) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   const isAuth = !!token;
-  const { pathname } = req.nextUrl;
 
-  // 認証ページ (/auth/signin) では middleware をスキップ
-  if (pathname.startsWith("/api/auth/login")) {
+  if (pathname.startsWith("/login")) {
     return NextResponse.next();
   }
 
@@ -18,14 +23,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 認証されていない場合は /auth/signin にリダイレクト
   if (!isAuth) {
-    return NextResponse.redirect(new URL("/api/auth/login", req.url));
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/auth|api|_next/static|_next/image|favicon.ico).*)"],
 };

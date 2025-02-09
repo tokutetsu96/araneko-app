@@ -9,7 +9,7 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-sm text-muted-foreground">
-            メールアドレスを入力してログインできます。
+            認証済みの方はメール認証もご利用できます
           </p>
         </div>
 
