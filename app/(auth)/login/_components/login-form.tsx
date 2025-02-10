@@ -1,13 +1,14 @@
 "use client";
 
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { Icon } from "./icon";
+
 import { toast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/icons/icon";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);

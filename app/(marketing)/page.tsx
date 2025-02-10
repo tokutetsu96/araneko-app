@@ -1,4 +1,4 @@
-import MotionLabel from "@/components/motion-label";
+import MotionLabel from "./_components/motion-label";
 
 export default function Home() {
   return (

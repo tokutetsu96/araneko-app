@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"; // 現在のパスを取得
 import links from "../data/link";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { ThemeButton } from "./theme-button";
+import { ThemeButton } from "./buttons/theme-button";
 
 export default function Header() {
   const { data: session } = useSession();

@@ -4,10 +4,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardHeader } from "@/components/ui/card";
 import { useState, useEffect, useCallback } from "react";
 import Spinner from "@/components/spinner";
-import AddSummonerForm from "@/components/add-summoner-form";
+
 import { opggSummoner } from "@/types/summoner";
 import { getRankColor } from "@/app/utils/rankUtils";
-import DeleteButton from "@/components/delete-button";
+import DeleteButton from "@/components/buttons/delete-button";
+import AddSummonerForm from "./_components/add-summoner-form";
 
 export default function OPGGListPage() {
   const [summoners, setSummoners] = useState<opggSummoner[]>([]);

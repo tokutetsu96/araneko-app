@@ -9,7 +9,7 @@ import {
 
 export default function TipsPage() {
   return (
-    <div className="container p-10 space-y-6">
+    <div className="container p-10">
       <h1 className="text-4xl font-semibold">Tips</h1>
       <hr className="my-2 border-t-2" />
 
@@ -71,10 +71,10 @@ export default function TipsPage() {
         </Table>
       </section>
       <section className="mt-10">
-        <div className="my-4">
+        <div className="mt-10">
           <h2 className="text-2xl font-semibold">■ ドラゴンに関する情報</h2>
         </div>
-        <section>
+        <section className="mt-10">
           <div className="my-4">
             <h2 className="text-xl font-semibold">各ドラゴンの出現と備考</h2>
             <Table>
