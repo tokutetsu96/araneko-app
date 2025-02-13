@@ -5,7 +5,11 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import GoogleProvider from "next-auth/providers/google";
 
-const prisma = new PrismaClient();
+// PrismaClient のグローバルインスタンスを再利用
+const globalForPrisma = global as unknown as { prisma?: PrismaClient };
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 // Gmail の SMTP 設定
 const transporter = nodemailer.createTransport({
@@ -42,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             `,
           });
         } catch (error) {
+          console.error("❌ メール送信エラー:", error);
           throw new Error("メール送信に失敗しました");
         }
       },
@@ -63,66 +68,65 @@ export const authOptions: NextAuthOptions = {
         console.error("❌ User email is missing");
         return false;
       }
-
-      // ✅ `account` が null の場合をチェック
       if (!account) {
         console.error("❌ Account information is missing");
         return false;
       }
 
-      // 既存のユーザーを取得
-      const existingUser = await prisma.user.findUnique({
-        where: { email: user.email },
-      });
-
-      if (existingUser) {
-        // 既存のユーザーがいる場合、そのユーザーの `Account` を確認
-        const existingAccount = await prisma.account.findUnique({
-          where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
+      try {
+        // 既存のユーザーとアカウント情報を同時に取得
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          include: {
+            accounts: {
+              where: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
             },
           },
         });
 
-        if (!existingAccount) {
-          await prisma.account.create({
+        if (existingUser) {
+          // アカウントが未登録なら作成
+          if (existingUser.accounts.length === 0) {
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                type: account.type,
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+              },
+            });
+          }
+        } else {
+          // 新規ユーザー作成
+          const newUser = await prisma.user.create({
             data: {
-              userId: existingUser.id,
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              type: account.type,
-              access_token: account.access_token,
-              refresh_token: account.refresh_token,
-              expires_at: account.expires_at,
+              name: user.name ?? "",
+              email: user.email,
+              image: user.image ?? "",
+              accounts: {
+                create: {
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  type: account.type,
+                  access_token: account.access_token,
+                  refresh_token: account.refresh_token,
+                  expires_at: account.expires_at,
+                },
+              },
             },
           });
         }
-      } else {
-        // 既存のユーザーがいない場合、新規作成
-        const newUser = await prisma.user.create({
-          data: {
-            name: user.name ?? "",
-            email: user.email,
-            image: user.image ?? "",
-          },
-        });
-
-        await prisma.account.create({
-          data: {
-            userId: newUser.id,
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            type: account.type,
-            access_token: account.access_token,
-            refresh_token: account.refresh_token,
-            expires_at: account.expires_at,
-          },
-        });
+        return true;
+      } catch (error) {
+        console.error("❌ signIn エラー:", error);
+        return false;
       }
-
-      return true;
     },
 
     async jwt({ token, user }) {
