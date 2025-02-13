@@ -15,11 +15,17 @@ const transporter = nodemailer.createTransport({
 });
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
     EmailProvider({
       server: process.env.EMAIL_SERVER,
@@ -46,88 +52,11 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      if (url.includes("/api/auth/callback/email")) {
-        return `${baseUrl}/`;
-      }
-      return baseUrl;
-    },
-
-    async signIn({ user, account }) {
-      if (!user.email) {
-        console.error("❌ User email is missing");
-        return false;
-      }
-      if (!account) {
-        console.error("❌ Account information is missing");
-        return false;
-      }
-
-      try {
-        // ユーザーとアカウントを **一括取得** してクエリを減らす
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
-          include: {
-            accounts: true, // ユーザーに紐づくアカウントも取得
-          },
-        });
-
-        if (existingUser) {
-          // 既に同じ provider のアカウントがあるか確認
-          const existingAccount = existingUser.accounts.find(
-            (acc) => acc.provider === account.provider
-          );
-
-          if (!existingAccount) {
-            // 既存のユーザーにはアカウントだけ追加
-            await prisma.account.create({
-              data: {
-                userId: existingUser.id,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                type: account.type,
-                access_token: account.access_token,
-                refresh_token: account.refresh_token,
-                expires_at: account.expires_at,
-              },
-            });
-          }
-        } else {
-          // 新規ユーザー作成を一括処理 (トランザクション)
-          await prisma.$transaction(async (tx) => {
-            const newUser = await tx.user.create({
-              data: {
-                name: user.name ?? "",
-                email: user.email ?? "",
-                image: user.image ?? "",
-              },
-            });
-
-            await tx.account.create({
-              data: {
-                userId: newUser.id,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                type: account.type,
-                access_token: account.access_token,
-                refresh_token: account.refresh_token,
-                expires_at: account.expires_at,
-              },
-            });
-          });
-        }
-
-        return true;
-      } catch (error) {
-        console.error("❌ signIn エラー:", error);
-        return false;
-      }
-    },
-
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -146,6 +75,13 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.picture;
       }
       return session;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.includes("/api/auth/callback/email")) {
+        return `${baseUrl}/`;
+      }
+      return baseUrl;
     },
   },
   session: { strategy: "jwt" },
