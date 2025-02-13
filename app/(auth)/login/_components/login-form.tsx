@@ -15,24 +15,6 @@ export default function LoginForm() {
   const [isGoogleLoginLoading, setIsGoogleLoginLoading] = useState(false);
   const [email, setEmail] = useState("");
 
-  // Google 認証処理
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoginLoading(true);
-
-    try {
-      const result = await signIn("google");
-    } catch (error) {
-      console.error("Googleログインエラー:", error);
-      toast({
-        title: "Googleログインに失敗しました。",
-        description: "もう一度試してください。",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGoogleLoginLoading(false);
-    }
-  };
-
   // Magic Link（メール認証）処理
   const handleEmailSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -116,7 +98,10 @@ export default function LoginForm() {
           </Button>
         ) : (
           <Button
-            onClick={handleGoogleSignIn}
+            onClick={() => {
+              setIsGoogleLoginLoading(true);
+              signIn("google");
+            }}
             className="flex items-center gap-2"
           >
             <Icon.google className="w-5 h-5" />
