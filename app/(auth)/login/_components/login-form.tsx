@@ -18,14 +18,22 @@ export default function LoginForm() {
   // Google 認証処理
   const handleGoogleSignIn = async () => {
     setIsGoogleLoginLoading(true);
-    const result = await signIn("google");
 
-    if (result?.error) {
+    try {
+      const result = await signIn("google");
+
+      if (!result?.ok) {
+        throw new Error("Googleログインに失敗しました。");
+      }
+    } catch (error) {
+      console.error("Googleログインエラー:", error);
       toast({
         title: "Googleログインに失敗しました。",
         description: "もう一度試してください。",
         variant: "destructive",
       });
+    } finally {
+      setIsGoogleLoginLoading(false);
     }
   };
 
