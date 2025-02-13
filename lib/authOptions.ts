@@ -9,8 +9,6 @@ import GoogleProvider from "next-auth/providers/google";
 const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
 // Gmail の SMTP 設定
 const transporter = nodemailer.createTransport({
   service: "gmail",
