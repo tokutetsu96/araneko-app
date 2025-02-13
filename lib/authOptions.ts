@@ -74,58 +74,58 @@ export const authOptions: NextAuthOptions = {
       }
 
       try {
-        // ユーザーとアカウントを **一括取得** してクエリを減らす
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
-          include: {
-            accounts: true, // ユーザーに紐づくアカウントも取得
-          },
-        });
+        // // ユーザーとアカウントを **一括取得** してクエリを減らす
+        // const existingUser = await prisma.user.findUnique({
+        //   where: { email: user.email },
+        //   include: {
+        //     accounts: true, // ユーザーに紐づくアカウントも取得
+        //   },
+        // });
 
-        if (existingUser) {
-          // 既に同じ provider のアカウントがあるか確認
-          const existingAccount = existingUser.accounts.find(
-            (acc) => acc.provider === account.provider
-          );
+        // if (existingUser) {
+        //   // 既に同じ provider のアカウントがあるか確認
+        //   const existingAccount = existingUser.accounts.find(
+        //     (acc) => acc.provider === account.provider
+        //   );
 
-          if (!existingAccount) {
-            // 既存のユーザーにはアカウントだけ追加
-            await prisma.account.create({
-              data: {
-                userId: existingUser.id,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                type: account.type,
-                access_token: account.access_token,
-                refresh_token: account.refresh_token,
-                expires_at: account.expires_at,
-              },
-            });
-          }
-        } else {
-          // 新規ユーザー作成を一括処理 (トランザクション)
-          await prisma.$transaction(async (tx) => {
-            const newUser = await tx.user.create({
-              data: {
-                name: user.name ?? "",
-                email: user.email ?? "",
-                image: user.image ?? "",
-              },
-            });
+        //   if (!existingAccount) {
+        //     // 既存のユーザーにはアカウントだけ追加
+        //     await prisma.account.create({
+        //       data: {
+        //         userId: existingUser.id,
+        //         provider: account.provider,
+        //         providerAccountId: account.providerAccountId,
+        //         type: account.type,
+        //         access_token: account.access_token,
+        //         refresh_token: account.refresh_token,
+        //         expires_at: account.expires_at,
+        //       },
+        //     });
+        //   }
+        // } else {
+        //   // 新規ユーザー作成を一括処理 (トランザクション)
+        //   await prisma.$transaction(async (tx) => {
+        //     const newUser = await tx.user.create({
+        //       data: {
+        //         name: user.name ?? "",
+        //         email: user.email ?? "",
+        //         image: user.image ?? "",
+        //       },
+        //     });
 
-            await tx.account.create({
-              data: {
-                userId: newUser.id,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                type: account.type,
-                access_token: account.access_token,
-                refresh_token: account.refresh_token,
-                expires_at: account.expires_at,
-              },
-            });
-          });
-        }
+        //     await tx.account.create({
+        //       data: {
+        //         userId: newUser.id,
+        //         provider: account.provider,
+        //         providerAccountId: account.providerAccountId,
+        //         type: account.type,
+        //         access_token: account.access_token,
+        //         refresh_token: account.refresh_token,
+        //         expires_at: account.expires_at,
+        //       },
+        //     });
+        //   });
+        // }
 
         return true;
       } catch (error) {
