@@ -79,8 +79,10 @@ export const authOptions: NextAuthOptions = {
         // 既存のユーザーがいる場合、そのユーザーの `Account` を確認
         const existingAccount = await prisma.account.findUnique({
           where: {
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
+            provider_providerAccountId: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
           },
         });
 
