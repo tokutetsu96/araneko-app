@@ -59,9 +59,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async signIn({ user, account }) {
-      console.log("🔍 signIn user:", user);
-      console.log("🔍 signIn account:", account);
-
       if (!user.email) {
         console.error("❌ User email is missing");
         return false;
@@ -88,7 +85,6 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!existingAccount) {
-          console.log("🆕 既存のユーザーに Google アカウントをリンク");
           await prisma.account.create({
             data: {
               userId: existingUser.id,
@@ -103,7 +99,6 @@ export const authOptions: NextAuthOptions = {
         }
       } else {
         // 既存のユーザーがいない場合、新規作成
-        console.log("🆕 新規ユーザーを作成:", user.email);
         const newUser = await prisma.user.create({
           data: {
             name: user.name ?? "",
@@ -112,7 +107,6 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        console.log("🔗 新規ユーザーに Google アカウントをリンク");
         await prisma.account.create({
           data: {
             userId: newUser.id,
