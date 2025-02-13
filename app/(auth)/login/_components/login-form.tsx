@@ -21,10 +21,6 @@ export default function LoginForm() {
 
     try {
       const result = await signIn("google");
-
-      if (!result?.ok) {
-        throw new Error("Googleログインに失敗しました。");
-      }
     } catch (error) {
       console.error("Googleログインエラー:", error);
       toast({

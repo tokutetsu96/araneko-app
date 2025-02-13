@@ -3,7 +3,6 @@ import EmailProvider from "next-auth/providers/email";
 import nodemailer from "nodemailer";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
-import { db } from "./db";
 import { prisma } from "./prisma";
 
 // Gmail の SMTP 設定
@@ -16,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
