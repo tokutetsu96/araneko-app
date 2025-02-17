@@ -5,13 +5,15 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation"; // 現在のパスを取得
 import links from "../data/link";
 import { Button } from "./ui/button";
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarImage } from "./ui/avatar";
 import { ThemeButton } from "./buttons/theme-button";
 
 export default function Header() {
   const { data: session } = useSession();
   // 現在のページのパス
   const pathname = usePathname();
+
+  console.log(session?.user.image);
 
   return (
     <div className="w-full border-b">
@@ -50,7 +52,7 @@ export default function Header() {
           {/* 右側のユーザー情報 & ログアウトボタン */}
           <div className="flex items-center gap-4">
             <Avatar className="w-10 h-10">
-              {session?.user?.image && (
+              {session?.user.image && (
                 <AvatarImage
                   src={session?.user?.image}
                   alt={session?.user?.name || ""}
