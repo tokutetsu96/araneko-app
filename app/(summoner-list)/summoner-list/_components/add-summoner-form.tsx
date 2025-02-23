@@ -53,6 +53,12 @@ export default function AddSummonerForm({
     ? "bg-black text-white"
     : "bg-white text-black";
 
+  const flipBgColor = !mounted
+    ? "bg-transparent"
+    : theme === "dark"
+    ? "bg-white text-black"
+    : "bg-black text-white";
+
   const handleSubmitSummoner = async (data: addSummonerSchemaType) => {
     setLoading(true);
     setError(null);
@@ -162,7 +168,11 @@ export default function AddSummonerForm({
               )}
             />
 
-            <Button type="submit" disabled={loading} className="w-full">
+            <Button
+              type="submit"
+              disabled={loading}
+              className={`w-full ${flipBgColor}`}
+            >
               {loading ? "登録中..." : "登録"}
             </Button>
           </form>

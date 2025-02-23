@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { usePathname } from "next/navigation"; // 現在のパスを取得
+import { usePathname } from "next/navigation";
 import links from "../data/link";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";
@@ -13,8 +13,6 @@ export default function Header() {
   // 現在のページのパス
   const pathname = usePathname();
 
-  console.log(session?.user.image);
-
   return (
     <div className="w-full border-b">
       {/* Main Navigation */}
@@ -23,7 +21,7 @@ export default function Header() {
           {/* 左側のナビゲーション */}
           <div className="flex items-center space-x-6">
             {links
-              .filter((link) => link.label !== "AraNeko APP") // リンク内のロゴを除外
+              .filter((link) => link.label !== "AraNeko APP")
               .map((link, index) => {
                 const isActive = pathname === link.href;
                 return (
