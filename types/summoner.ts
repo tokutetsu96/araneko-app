@@ -6,6 +6,15 @@ export type opggSummoner = {
   rankInfo: RankInfo;
 };
 
+export type mySummoner = {
+  id: number;
+  summonerName: string;
+  opggUrl: string;
+  tag: string;
+  rankInfo: RankInfo;
+  summonerData: SummonerData;
+};
+
 type RankInfo = {
   leagueId: string;
   queueType: string;
@@ -19,4 +28,14 @@ type RankInfo = {
   inactive: boolean;
   freshBlood: boolean;
   hotStreak: boolean;
+};
+
+// サモナー情報の型
+type SummonerData = {
+  accountId: string;
+  id: string;
+  profileIconId: number;
+  puuid: string;
+  revisionDate: number;
+  summonerLevel: number;
 };

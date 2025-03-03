@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardHeader } from "@/components/ui/card";
 import Spinner from "@/components/spinner";
-import { opggSummoner } from "@/types/summoner";
+import { mySummoner } from "@/types/summoner";
 import { getRankColor } from "@/app/utils/rankUtils";
 
 export default function MyPage() {
-  const [mySummoner, setMySummoner] = useState<opggSummoner | null>(null);
+  const [mySummoner, setMySummoner] = useState<mySummoner | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,15 +15,19 @@ export default function MyPage() {
     setLoading(true);
     try {
       const response = await fetch("/api/fetch-mysummoner-info");
+
       if (!response.ok) {
         throw new Error(`データの取得に失敗しました: HTTP ${response.status}`);
       }
-      if (response == null) {
-        return;
-      }
+
       const data = await response.json();
-      const rankData = await fetchRankInfo(data.summonerName, data.tag);
-      setMySummoner({ ...data, rankInfo: rankData || {} });
+      console.log(data);
+
+      setMySummoner({
+        ...data,
+        summonerData: data.summonerData,
+        rankInfo: data.rankData || {},
+      });
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -35,24 +38,6 @@ export default function MyPage() {
       setLoading(false);
     }
   }, []);
-
-  const fetchRankInfo = async (summonerName: string, tag: string) => {
-    const response = await fetch(
-      `/api/fetch-summoner?gameName=${summonerName}&tagLine=${tag}`
-    );
-
-    if (!response.ok) {
-      setError("サモナー情報の取得に失敗しました");
-      return null;
-    }
-
-    const data = await response.json();
-    if (!data.rankData || data.rankData.length === 0) {
-      return null;
-    }
-
-    return data.rankData[0];
-  };
 
   useEffect(() => {
     fetchMySummonerInfo();
@@ -79,6 +64,14 @@ export default function MyPage() {
               className="text-white"
             >
               <div className="flex space-x-2 font-bold text-lg text-white stroke-black stroke-2">
+                <img
+                  src={`https://ddragon.leagueoflegends.com/cdn/14.3.1/img/profileicon/${mySummoner.summonerData.profileIconId}.png`}
+                  alt="Summoner Profile Icon"
+                  width={50}
+                  height={50}
+                  className="rounded-lg"
+                />
+
                 <p>{mySummoner.summonerName}</p>
                 <p>#{mySummoner.tag}</p>
               </div>
