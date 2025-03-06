@@ -18,6 +18,7 @@ export async function GET() {
 
     const summonerName = mySummoner?.summonerName.trim() ?? "";
     const tag = mySummoner?.tag.trim() ?? "";
+    const opggUrl = mySummoner?.opggUrl.trim() ?? "";
 
     // **1. PUUID を取得**
     const accountResponse = await fetch(
@@ -65,6 +66,7 @@ export async function GET() {
     return NextResponse.json({
       summonerName,
       tag,
+      opggUrl,
       summonerData,
       rankData: rankData[0],
     });
