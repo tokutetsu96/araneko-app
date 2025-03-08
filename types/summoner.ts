@@ -8,11 +8,15 @@ export type opggSummoner = {
 
 export type mySummoner = {
   id: number;
+  opggData: OpggData;
+  rankInfo: RankInfo;
+  summonerData: SummonerData;
+};
+
+type OpggData = {
   summonerName: string;
   opggUrl: string;
   tag: string;
-  rankInfo: RankInfo;
-  summonerData: SummonerData;
 };
 
 type RankInfo = {

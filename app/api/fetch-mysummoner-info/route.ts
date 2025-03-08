@@ -64,9 +64,11 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      summonerName,
-      tag,
-      opggUrl,
+      opggData: {
+        summonerName,
+        tag,
+        opggUrl,
+      },
       summonerData,
       rankData: rankData[0],
     });
