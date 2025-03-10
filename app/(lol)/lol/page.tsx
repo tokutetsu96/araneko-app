@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Shield, ExternalLink, RefreshCw, Plus } from "lucide-react";
+import Image from "next/image";
 import type { opggSummoner } from "@/types/summoner";
 import { getRankColor } from "@/app/utils/rankUtils";
 import { Button } from "@/components/ui/button";
@@ -233,9 +234,11 @@ export default function OPGGListPage() {
                           }}
                         >
                           <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                            <img
+                            <Image
                               src={getTierImage(summoner.rankInfo?.tier)}
                               alt={summoner.rankInfo?.tier || "Unranked"}
+                              width={40}
+                              height={40}
                               className="h-10 w-10 object-contain"
                             />
                           </div>
