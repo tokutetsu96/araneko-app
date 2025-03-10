@@ -5,6 +5,7 @@ import type React from "react";
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, Shield, Trophy, Swords, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import type { mySummoner } from "@/types/summoner";
 import { getRankColor as getRankColorFromUtils } from "@/app/utils/rankUtils";
 import { Button } from "@/components/ui/button";
@@ -167,7 +168,7 @@ export default function MyPage() {
                         damping: 10,
                       }}
                     >
-                      <img
+                      <Image
                         src={`https://ddragon.leagueoflegends.com/cdn/14.3.1/img/profileicon/${mySummoner.summonerData.profileIconId}.png`}
                         alt="Summoner Profile Icon"
                         width={80}
@@ -175,7 +176,7 @@ export default function MyPage() {
                         className="rounded-full border-2 border-white shadow-md"
                       />
                       <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-md">
-                        <img
+                        <Image
                           src={
                             getTierImage(mySummoner.rankInfo?.tier) ||
                             "/placeholder.svg"
