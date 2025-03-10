@@ -4,13 +4,16 @@ import type React from "react";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Shield, Trophy, Swords, ExternalLink, RefreshCw } from "lucide-react";
+import { RefreshCw, Shield, Trophy, Swords, ExternalLink } from "lucide-react";
 import type { mySummoner } from "@/types/summoner";
 import { getRankColor as getRankColorFromUtils } from "@/app/utils/rankUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatsCard } from "@/app/(mypage)/mypage/_components/StatsCard";
+import { SummonerSkeleton } from "@/app/(mypage)/mypage/_components/SummonerSkeleton";
+import { ErrorCard } from "@/app/(mypage)/mypage/_components/ErrorCard";
+import { EmptyState } from "@/app/(mypage)/mypage/_components/EmptyState";
 
 export default function MyPage() {
   const [mySummoner, setMySummoner] = useState<mySummoner | null>(null);
@@ -272,101 +275,5 @@ export default function MyPage() {
         </motion.div>
       )}
     </div>
-  );
-}
-
-function StatsCard({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number | string;
-  color: string;
-}) {
-  return (
-    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 flex items-center gap-3">
-      <div className="flex-shrink-0">{icon}</div>
-      <div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-        <p className={`text-lg font-bold ${color}`}>{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function SummonerSkeleton() {
-  return (
-    <Card className="overflow-hidden border-0 shadow-lg">
-      <div className="h-3 w-full bg-gray-200 dark:bg-gray-700" />
-      <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Skeleton className="h-20 w-20 rounded-full" />
-              <Skeleton className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          </div>
-
-          <div className="flex-1 mt-4 md:mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-20 w-full" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ErrorCard({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
-  return (
-    <Card className="border-rose-200 bg-rose-50 dark:bg-rose-950/20 dark:border-rose-900/50">
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="text-rose-500 text-5xl">⚠️</div>
-          <h3 className="text-xl font-semibold text-rose-700 dark:text-rose-300">
-            エラーが発生しました
-          </h3>
-          <p className="text-rose-600 dark:text-rose-400">{message}</p>
-          <Button variant="outline" onClick={onRetry} className="mt-2">
-            再試行
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function EmptyState() {
-  return (
-    <Card className="border-dashed border-2 bg-gray-50 dark:bg-gray-800/50">
-      <CardContent className="p-8">
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="text-gray-400 text-5xl">🎮</div>
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-            サモナーが登録されていません
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400">
-            League of
-            Legendsのサモナー情報を登録して、プロフィールを表示しましょう。
-          </p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
