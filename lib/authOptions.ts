@@ -14,6 +14,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// 本番環境かどうかを判定
+const isProduction = process.env.NODE_ENV === "production";
+const productionUrl =
+  process.env.NEXTAUTH_URL || "https://araneko-app.vercel.app/";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -56,6 +61,82 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  cookies: {
+    sessionToken: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+    callbackUrl: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+    csrfToken: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        maxAge: 900,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+    state: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        maxAge: 900,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+    nonce: {
+      name: `${isProduction ? "__Secure-" : ""}next-auth.nonce`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+        domain: isProduction
+          ? "." + new URL(productionUrl).hostname
+          : undefined,
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -86,4 +167,6 @@ export const authOptions: NextAuthOptions = {
   },
   session: { strategy: "jwt" },
   jwt: { secret: process.env.NEXTAUTH_SECRET },
+  // デバッグモードを有効にする（本番環境では無効にすることを推奨）
+  debug: process.env.NODE_ENV === "development",
 };
