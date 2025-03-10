@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/provider/session-provider";
-import { ThemeProvider } from "@/components/provider/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Navbar } from "@/components/navbar";
+import { Toaster } from "sonner";
+import { AuthProvider } from "@/components/auth-provider";
 import { siteConfig } from "@/config/site";
 
-const notoSansJP = Noto_Sans_JP({
-  variable: "--font-noto-sans-jp",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -28,18 +26,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className={`${notoSansJP.variable} antialiased`}>
-        <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </AuthProvider>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Toaster richColors closeButton position="top-right" />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

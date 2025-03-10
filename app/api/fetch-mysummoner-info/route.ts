@@ -16,6 +16,14 @@ export async function GET() {
       where: { userId },
     });
 
+    // mySummonerが存在しない場合は空のデータを返す
+    if (!mySummoner) {
+      return NextResponse.json({
+        isEmpty: true,
+        message: "サモナーが登録されていません",
+      });
+    }
+
     const summonerName = mySummoner?.summonerName.trim() ?? "";
     const tag = mySummoner?.tag.trim() ?? "";
     const opggUrl = mySummoner?.opggUrl.trim() ?? "";
@@ -60,7 +68,15 @@ export async function GET() {
 
     if (!rankResponse.ok || rankData.length === 0) {
       // ランクをプレイしていない場合もあるのでnullを返す
-      return NextResponse.json({ summonerData, rankData: null });
+      return NextResponse.json({
+        opggData: {
+          summonerName,
+          tag,
+          opggUrl,
+        },
+        summonerData,
+        rankData: null,
+      });
     }
 
     return NextResponse.json({
@@ -73,6 +89,20 @@ export async function GET() {
       rankData: rankData[0],
     });
   } catch (error) {
-    return NextResponse.json({ error: "データ取得エラー" }, { status: 500 });
+    console.error("API Error:", error);
+    return NextResponse.json(
+      {
+        error: "データ取得エラー",
+        // エラー時にも最低限のデータ構造を維持
+        opggData: {
+          summonerName: "",
+          tag: "",
+          opggUrl: "",
+        },
+        summonerData: null,
+        rankData: null,
+      },
+      { status: 500 }
+    );
   }
 }

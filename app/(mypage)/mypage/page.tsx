@@ -4,7 +4,14 @@ import type React from "react";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw, Shield, Trophy, Swords, ExternalLink } from "lucide-react";
+import {
+  RefreshCw,
+  Shield,
+  Trophy,
+  Swords,
+  ExternalLink,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import type { mySummoner } from "@/types/summoner";
 import { getRankColor as getRankColorFromUtils } from "@/app/utils/rankUtils";
@@ -15,12 +22,25 @@ import { StatsCard } from "@/app/(mypage)/mypage/_components/StatsCard";
 import { SummonerSkeleton } from "@/app/(mypage)/mypage/_components/SummonerSkeleton";
 import { ErrorCard } from "@/app/(mypage)/mypage/_components/ErrorCard";
 import { EmptyState } from "@/app/(mypage)/mypage/_components/EmptyState";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function MyPage() {
   const [mySummoner, setMySummoner] = useState<mySummoner | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchMySummonerInfo = useCallback(async () => {
     setLoading(true);
@@ -29,18 +49,43 @@ export default function MyPage() {
       if (!response.ok) {
         throw new Error(`データの取得に失敗しました: HTTP ${response.status}`);
       }
+
       const data = await response.json();
-      setMySummoner({
-        ...data,
-        summonerData: data.summonerData,
-        rankInfo: data.rankData || {},
-      });
+
+      // サモナーが登録されていない場合
+      if (data.isEmpty) {
+        setMySummoner(null);
+        setError(null); // エラーではなく空の状態として扱う
+      } else if (data.error) {
+        // APIからのエラーメッセージがある場合
+        setError(data.error);
+        setMySummoner(null);
+      } else {
+        // 正常にデータが取得できた場合
+        // APIレスポンスの構造を確認し、必要なプロパティが存在することを確認
+        if (!data.opggData) {
+          // opggDataが存在しない場合は作成
+          data.opggData = {
+            summonerName: data.summonerData?.name || "",
+            tag: data.tag || "",
+            opggUrl: data.opggUrl || "",
+          };
+        }
+
+        setMySummoner({
+          ...data,
+          summonerData: data.summonerData || {},
+          rankInfo: data.rankData || {},
+        });
+        setError(null);
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("不明なエラーが発生しました");
       }
+      setMySummoner(null);
     } finally {
       setLoading(false);
     }
@@ -52,12 +97,41 @@ export default function MyPage() {
     setTimeout(() => setRefreshing(false), 600);
   };
 
+  const handleDeleteSummoner = async () => {
+    setDeleting(true);
+    try {
+      const response = await fetch("/api/delete-mysummoner", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("サモナー情報の削除に失敗しました");
+      }
+
+      // 削除成功
+      toast.success("サモナー情報が正常に削除されました", {
+        description: "新しいサモナーを登録できます",
+      });
+
+      // 状態をリセット
+      setMySummoner(null);
+      setError(null);
+    } catch (err) {
+      toast.error("エラーが発生しました", {
+        description:
+          err instanceof Error ? err.message : "不明なエラーが発生しました",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   useEffect(() => {
     fetchMySummonerInfo();
   }, [fetchMySummonerInfo]);
 
   const handleSummonerClick = () => {
-    if (mySummoner) {
+    if (mySummoner && mySummoner.opggData && mySummoner.opggData.opggUrl) {
       window.open(mySummoner.opggData.opggUrl, "_blank");
     }
   };
@@ -120,18 +194,60 @@ export default function MyPage() {
         >
           サモナープロフィール
         </motion.h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw
-            className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-          />
-          更新する
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing || !mySummoner}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
+            更新する
+          </Button>
+
+          {mySummoner && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={deleting}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  削除
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>サモナー情報の削除</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    サモナー情報を削除してもよろしいですか？この操作は元に戻せません。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteSummoner}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {deleting ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        削除中...
+                      </>
+                    ) : (
+                      "削除する"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
 
       <div className="h-px w-full bg-border" />

@@ -1,8 +1,8 @@
 import { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
-  name: "AraNeko APP",
-  description: "サモナーの管理、LoLの情報を見ることができます",
-  url: "http://localhost:3000",
-  ogImage: "",
+  name: "Araneko App",
+  description: "League of Legends Summoner Tracker",
+  url: "https://araneko-app.vercel.app",
+  ogImage: "https://araneko-app.vercel.app/og.jpg",
 };

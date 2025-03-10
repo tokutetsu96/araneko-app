@@ -167,6 +167,4 @@ export const authOptions: NextAuthOptions = {
   },
   session: { strategy: "jwt" },
   jwt: { secret: process.env.NEXTAUTH_SECRET },
-  // デバッグモードを有効にする（本番環境では無効にすることを推奨）
-  debug: process.env.NODE_ENV === "development",
 };

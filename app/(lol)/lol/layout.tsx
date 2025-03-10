@@ -1,5 +1,3 @@
-import Header from "@/components/header";
-
 export default function OpggListLayout({
   children,
 }: {
@@ -7,9 +5,6 @@ export default function OpggListLayout({
 }) {
   return (
     <div>
-      <header>
-        <Header />
-      </header>
       <main>{children}</main>
     </div>
   );

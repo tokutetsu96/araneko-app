@@ -6,12 +6,37 @@ export type opggSummoner = {
   rankInfo: RankInfo;
 };
 
-export type mySummoner = {
-  id: number;
-  opggData: OpggData;
-  rankInfo: RankInfo;
-  summonerData: SummonerData;
-};
+export interface mySummoner {
+  opggData: {
+    summonerName: string;
+    tag: string;
+    opggUrl: string;
+  };
+  summonerData: {
+    id: string;
+    accountId: string;
+    puuid: string;
+    name: string;
+    profileIconId: number;
+    revisionDate: number;
+    summonerLevel: number;
+  };
+  rankInfo: {
+    leagueId?: string;
+    queueType?: string;
+    tier?: string;
+    rank?: string;
+    summonerId?: string;
+    summonerName?: string;
+    leaguePoints?: number;
+    wins?: number;
+    losses?: number;
+    veteran?: boolean;
+    inactive?: boolean;
+    freshBlood?: boolean;
+    hotStreak?: boolean;
+  };
+}
 
 type OpggData = {
   summonerName: string;
