@@ -20,6 +20,8 @@ export default function OPGGListPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const sleep = (ms: number | undefined) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   // 無限レンダリングを防ぐために、useCallbackを使って関数をメモ化
   const fetchSummoners = useCallback(async () => {
@@ -31,6 +33,7 @@ export default function OPGGListPage() {
       if (!response.ok) {
         throw new Error(`データの取得に失敗しました: HTTP ${response.status}`);
       }
+      await sleep(500);
       const data = await response.json();
       // サモナー情報を取得した後、ランク情報をRiot APIから取得
       const summonersWithRank = await Promise.all(

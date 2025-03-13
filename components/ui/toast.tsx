@@ -1,6 +1,3 @@
-// このファイルはSonnerに移行したため、単なるエクスポートのみを提供します
-// 実際の実装はapp/layout.tsxで<Toaster />コンポーネントを使用しています
-
 import { toast } from "sonner";
 
 // 型定義のみを提供して後方互換性を維持
