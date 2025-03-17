@@ -61,7 +61,7 @@ export function EmptyState() {
       }
 
       // 登録成功後、ページをリロードして新しいデータを表示
-      router.refresh();
+      window.location.reload();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "不明なエラーが発生しました"
